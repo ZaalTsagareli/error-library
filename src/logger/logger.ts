@@ -1,64 +1,48 @@
-import { Levels } from "../enums/levels.enum";
 import { logTypes } from "../enums/logTypes.enum";
-import { HandleTransportConstructor } from "../interfaces/handleTransportConstructor.interface";
 import { LoggerOptions } from "../interfaces/loggerOptions.interface";
-import { HandleTransport } from "../transport/handleTransport";
+import EventEmitter from "events";
+import { listenerHandlers } from "./listenerHandlers";
 
 export class Logger {
   private options: LoggerOptions;
+  private listener: EventEmitter;
+  private listenerHandler: listenerHandlers;
 
   private constructor(options: LoggerOptions) {
     this.options = options;
+    this.listener = new EventEmitter();
+    this.listenerHandler = new listenerHandlers(this.options);
+    this.startListen();
   }
 
   public static getLogger(options: LoggerOptions): Logger {
     return new Logger(options);
   }
 
+  private startListen() {
+    this.listener.on(logTypes.WARN, (message) =>
+      this.listenerHandler.handleWarnLog(message)
+    );
+
+    this.listener.on(
+      logTypes.DEBUG,
+      (message) => () => this.listenerHandler.handleDebugLog(message)
+    );
+
+    this.listener.on(logTypes.ERROR, (message, error) =>
+      this.listenerHandler.handleErrorLog(message, error)
+    );
+  }
+
   public error(message: string, error?: Error): void {
-    if (this.options.level >= Levels.ERROR) {
-      const dataForTransport = this.getDataForTransport(
-        message,
-        logTypes.ERROR,
-        error
-      );
-      new HandleTransport(dataForTransport);
-    }
+    this.listener.emit(logTypes.ERROR, message, error);
   }
 
   public warn(message: string): void {
-    if (this.options.level >= Levels.WARN) {
-      const dataForTransport = this.getDataForTransport(message, logTypes.WARN);
-      new HandleTransport(dataForTransport);
-    }
+    this.listener.emit(logTypes.WARN, message);
   }
 
   public debug(message: string): void {
-    if (this.options.level >= Levels.DEBUG) {
-      const dataForTransport = this.getDataForTransport(
-        message,
-        logTypes.DEBUG
-      );
-      new HandleTransport(dataForTransport);
-    }
-  }
-
-  private formatMessage(message: string) {
-    return this.options.format
-      .replace("%t", new Date().toISOString())
-      .replace("%s", message);
-  }
-
-  private getDataForTransport(
-    message: string,
-    type: logTypes,
-    err?: Error
-  ): HandleTransportConstructor {
-    return {
-      options: this.options,
-      data: this.formatMessage(message),
-      type: type,
-      error: err,
-    };
+    this.listener.emit(logTypes.DEBUG, message);
   }
 }
