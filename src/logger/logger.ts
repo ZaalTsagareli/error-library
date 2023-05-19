@@ -4,9 +4,9 @@ import EventEmitter from "events";
 import { listenerHandlers } from "./listenerHandlers";
 
 export class Logger {
-  private options: LoggerOptions;
-  private listener: EventEmitter;
-  private listenerHandler: listenerHandlers;
+  private readonly options: LoggerOptions;
+  private readonly listener: EventEmitter;
+  private readonly listenerHandler: listenerHandlers;
 
   private constructor(options: LoggerOptions) {
     this.options = options;

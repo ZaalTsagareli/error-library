@@ -4,10 +4,10 @@ import { HandleTransportConstructor } from "../interfaces/handleTransportConstru
 import { LoggerOptions } from "../interfaces/loggerOptions.interface";
 
 export class HandleTransport {
-  private otpions: LoggerOptions;
-  private data: string;
-  private type: logTypes;
-  private error: Error;
+  private readonly otpions: LoggerOptions;
+  private readonly data: string;
+  private readonly type: logTypes;
+  private readonly error: Error;
   constructor(data: HandleTransportConstructor) {
     this.otpions = data.options;
     this.data = data.data;

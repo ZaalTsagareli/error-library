@@ -5,7 +5,7 @@ import { LoggerOptions } from "../interfaces/loggerOptions.interface";
 import { HandleTransport } from "../transport/handleTransport";
 
 export class listenerHandlers {
-  private options: LoggerOptions;
+  private readonly options: LoggerOptions;
 
   constructor(options: LoggerOptions) {
     this.options = options;
