@@ -1,13 +1,13 @@
-import { Levels } from "./enums/levels.enum";
-import { Transports } from "./enums/transports.enum";
-import { Logger } from "./logger/logger";
+import { transporType } from "./types/loggerConfig.type";
+import { LogLevel } from "./enums/logLevel";
+import { ResultFormatter } from "./format/format";
+import { ConsoleLogger } from "./logger/console.logger";
+import { LoggerModule } from "./logger/logger";
 
-const logger = Logger.getLogger({
-  format: "%t - %s",
-  level: Levels.WARN,
-  transport: Transports.CONSOLE,
-});
+const logger = new ConsoleLogger(new ResultFormatter());
 
-logger.warn("warning message");
-logger.error("error happened", new Error());
-logger.debug("dummy log");
+const consoleLogger = new LoggerModule(logger).getLogger();
+
+consoleLogger.setLevel(LogLevel.ALL);
+consoleLogger.setTransport({ transport: "UDP" });
+consoleLogger.debug("hey", { hello: "xadas" });
